@@ -40,13 +40,46 @@ use Log;
 
     /************************************************************GET***********************************************************/
     
+    public function getToken(Request $request)
+    {
+        try {    
+          $idPersona = $request->query('id_usuario');
+            
+          $token = Crypt::encrypt(['id_usuario' => $idPersona]);
+          return response()->json($token, 200);
+        } catch (\Throwable $th) {
+          Log::info($th);
+          error_log($th);
+          return response()->json(['mensaje' => '01 Error al obtener el Token'], 500);
+        }
+    }
+
+    public function obtenIdPerito($request){
+      $authToken = $request->header('Authorization');
+      if ($authToken) {
+        $sesion = Crypt::decrypt($authToken);
+      } else {
+        return false;
+      }            
+      $idUsuario = $sesion['id_usuario'];
+      return $idUsuario;
+    }
+
     /**
      * Método para obtener un dataset con la información del catalogo de rango niveles
      *    
      * @return json $infoCatalogo contiene los datos del catalogo de indivisos
      */
-    public function getCatIndiviso(){
+    public function getCatIndiviso(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $infoCatalogo = $this->modelCatalogos->GetCatIndiviso();
         return response()->json($infoCatalogo,200);
       }catch (\Throwable $th){
@@ -66,6 +99,10 @@ use Log;
      */
     public function obtenerDireccionPorId(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idDireccion = $request->query('idDireccion');
         $infoDireccion = $this->modelCondominios->ObtenerDireccionPorId($idDireccion);
         return response()->json($infoDireccion,200);
@@ -86,6 +123,10 @@ use Log;
      */
     public function getCatRangoNivelesUso(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idUsoEjercicio = $request->query('idUsoEjercicio');
         $infoCatalogo = $this->modelCatalogos->GetCatRangoNivelesUso($idUsoEjercicio);
         return response()->json($infoCatalogo,200);
@@ -97,7 +138,11 @@ use Log;
     }
 
     public function getCatRangoNiveles(Request $request){
-      try{        
+      try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $infoCatalogo = $this->modelCatalogos->GetCatRangoNiveles();
         return response()->json($infoCatalogo,200);
       }catch (\Throwable $th){
@@ -117,6 +162,10 @@ use Log;
      */
     public function obtenerDatosDSCondMantRellenosPorIdSolicitud(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $arr = array();
         $arr['FEXNOT_SOLICITUDES_M'] = $this->modelCondominios->Fexnot_solicitudes_m($idSolicitud);
@@ -160,6 +209,10 @@ use Log;
      */
     public function obtenerIdSolicitudPorUnidadPredial(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $region = $request->query('region');
         $manzana = $request->query('manzana');
         $lote = $request->query('lote');
@@ -187,6 +240,10 @@ use Log;
      */
     public function obtenerIdSolicitudPorUnidadPredial2(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $region = $request->query('region');
         $manzana = $request->query('manzana');
         $lote = $request->query('lote');
@@ -220,6 +277,11 @@ use Log;
      */
     public function obtenerSolicitudPorFechaEstado(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
+        
         $fechaInicio = $request->query('fechaInicio');
         $fechaFin = $request->query('fechaFin');
         $codestado = $request->query('codestado');
@@ -268,6 +330,10 @@ use Log;
      */
     public function obtenerSolicitudPorCuentaPredialEstado(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $region = $request->query('region');
         $manzana = $request->query('manzana');
         $lote = $request->query('lote');
@@ -315,6 +381,10 @@ use Log;
      */
     public function obtenerSolicitudPorFechaCuentaPredial(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $fechaInicio = $request->query('fechaInicio');
         $fechaFin = $request->query('fechaFin');
         $region = $request->query('region');
@@ -368,6 +438,10 @@ use Log;
     //con este no pude lograr obtener informacion
     public function obtenerSolicitudPorFechaDomicilio(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $fechaInicio = $request->query('fechaInicio');
         $fechaFin = $request->query('fechaFin');
         $via = $request->query('via');
@@ -418,6 +492,10 @@ use Log;
      */
     public function obtenerPropietarios(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $nombre = $request->query('nombre');
         $apellidoPaterno = $request->query('apellidoPaterno');
         $apellidoMaterno = $request->query('apellidoMaterno');
@@ -460,6 +538,10 @@ use Log;
      */
     public function obtenerIsPropietarios(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $nombre = $request->query('nombre');
         $apellidoPaterno = $request->query('apellidoPaterno');
         $apellidoMaterno = $request->query('apellidoMaterno');
@@ -491,6 +573,10 @@ use Log;
      */
     public function obtenerEstadosPorCodApliyActivo(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $codAplicacion = $request->query('codAplicacion');
         $activo = $request->query('activo');
                 
@@ -514,6 +600,10 @@ use Log;
      */
     public function obtenerSolicitudPorIdSolicitud(Request $request){      
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $infoConsulta = $this->modelCondominios->Fexnot_solicitudes_m($idSolicitud);  
                
@@ -535,6 +625,10 @@ use Log;
      */
     public function obtenerSolicitudesDocPorIdSolicitud(Request $request){      
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
 
         $infoConsulta = $this->modelCondominios->Fexnot_solicitudesdoc_m($idSolicitud);  
@@ -560,6 +654,10 @@ use Log;
     public function obtenerInstEspecPorIdSolicyIdUnidadCond(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $idUnidalCondominal = $request->query('idUnidadCondominal');
 
@@ -584,6 +682,10 @@ use Log;
     public function obtenerPropietariosPorIdSolicitud(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');        
 
         $infoConsulta = $this->modelCondominios->ObtenerPropietariosPorIdSolicitud($idSolicitud);  
@@ -607,6 +709,10 @@ use Log;
     public function obtenerPropietariosInmueblePorIdSolicitud(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');        
 
         $infoConsulta = $this->modelCondominios->ObtenerPropietariosInmueblePorIdSolicitud($idSolicitud);  
@@ -630,6 +736,10 @@ use Log;
     public function obtenerPropietariosPorIdUnidadCondominal(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idUnidadCondominal = $request->query('idUnidadCondominal');        
 
         $infoConsulta = $this->modelCondominios->ObtenerPropietariosPorIdUnidadCondominal($idUnidadCondominal);  
@@ -653,6 +763,10 @@ use Log;
     public function obtenerPropietarioPorIdPersona(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idPersona = $request->query('idPersona');        
 
         $infoConsulta = $this->modelCondominios->ObtenerPropietarioPorIdPersona($idPersona);  
@@ -676,6 +790,10 @@ use Log;
     public function obtenerPropietarioFexnotPorIdPersona(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idPersona = $request->query('idPersona');        
 
         $infoConsulta = $this->modelCondominios->ObtenerPropietarioFexnotPorIdPersona($idPersona);  
@@ -698,6 +816,10 @@ use Log;
      */
     public function obtenerCaracteristicasPorIdUnidadCondominal(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idUnidadCondominal = $request->query('idUnidadCondominal');
 
         $infoConsulta = $this->modelCondominios->ObtenerCaracteristicasPorIdUnidadCondominal($idUnidadCondominal);
@@ -720,6 +842,10 @@ use Log;
      */
     public function obtenerUnidadCondPorIdSolicitud(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
 
         $infoConsulta = $this->modelCondominios->ObtenerUnidadCondPorIdSolicitud($idSolicitud);
@@ -742,6 +868,10 @@ use Log;
      */
     public function obtenerUnidadCondPorIdUnidadCond(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idUnidadCondominal = $request->query('idUnidadCondominal');
 
         $infoConsulta = $this->modelCondominios->ObtenerUnidadCondPorIdUnidadCond($idUnidadCondominal);
@@ -764,6 +894,10 @@ use Log;
      */
     public function obtenerClasePorIdClase(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idClase = $request->query('idClase');
 
         $infoConsulta = $this->modelCondominios->ObtenerClasePorIdClase($idClase);
@@ -787,6 +921,10 @@ use Log;
      */
     public function obtenerClasePorValor(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $valor = $request->query('valor');
         $codTipoMatriz = $request->query('codTipoMatriz');
 
@@ -811,6 +949,10 @@ use Log;
      */
     public function obtenerClasesEjercicioPorRangoIdClaseEjercicio(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idInicial = $request->query('idInicial');
         $idFinal = $request->query('idFinal');
 
@@ -834,6 +976,10 @@ use Log;
      */
     public function obtenerDatosCatastrales(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');  
 
         $infoConsulta = $this->modelCondominios->ObtenerDatosCatastrales($idSolicitud);
@@ -856,6 +1002,10 @@ use Log;
      */
     public function obtenerJustificanteCondominios(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');  
 
         $infoConsulta = $this->modelCondominios->ObtenerJustificanteCondominios($idSolicitud);
@@ -875,7 +1025,10 @@ use Log;
      */
     public function obtenerUsosMatriz(Request $request){
       try{  
-
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $infoConsulta = $this->modelCatalogos->ObtenerUsosMatriz();
                
         return response()->json($infoConsulta,200);
@@ -897,6 +1050,10 @@ use Log;
     public function obtenerCategoriasMatriz(Request $request){
       
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $codmatriz = $request->query('codmatriz');  
 
         $infoConsulta = $this->modelCondominios->ObtenerCategoriasMatriz($codmatriz);
@@ -920,6 +1077,10 @@ use Log;
      */
     public function obtenerCaract(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $codMatriz = $request->query('codMatriz');
         $codCategoria = $request->query('codCategoria');
 
@@ -940,7 +1101,10 @@ use Log;
      */
     public function obtenerTiposLocalidad(Request $request){
       try{
-        
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $infoConsulta = $this->modelCatalogos->ObtenerTiposLocalidad();
                
         return response()->json($infoConsulta,200);
@@ -962,6 +1126,10 @@ use Log;
      */
     public function ObtenerCaracteristicasBase(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $codmatriz = $request->query('codmatriz');
         $infoConsulta = $this->modelCondominios->ObtenerCaracteristicasBase($idSolicitud,$codmatriz);
@@ -984,6 +1152,10 @@ use Log;
      */
     public function obtenerSolicitudMatriz(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');        
         $infoConsulta = $this->modelCondominios->ObtenerSolicitudMatriz($idSolicitud);
                
@@ -1005,6 +1177,10 @@ use Log;
      */
     public function obtenerPropietariosNoRCON(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');        
         $infoConsulta = $this->modelCondominios->ObtenerPropietariosNoRCON($idSolicitud);
                
@@ -1039,6 +1215,10 @@ use Log;
      */
     public function cambiarPersona(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idPersona = $request->query('idPersona');
         $idPersonaRCON = $request->query('idPersonaRCON');
         $codTipoPersona = $request->query('codTipoPersona');
@@ -1073,6 +1253,10 @@ use Log;
      */
     public function cambiarIdPersonaRCON(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idPersona = $request->query('idPersona');
         $idPersonaRCON = $request->query('idPersonaRCON');
           
@@ -1099,6 +1283,10 @@ use Log;
      */
     public function cambiarProcedenciaPersona(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idPersona = $request->query('idPersona');
         $esNueva = $request->query('esNueva');
         $esRconModificada = $request->query('esRconModificada');
@@ -1125,6 +1313,10 @@ use Log;
      */
     public function cambiarEstadoSolicitud(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $codEstado = $request->query('codEstado');
             
@@ -1150,6 +1342,10 @@ use Log;
      */
     public function cambiarIdExpediente(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $idSolicitud = $request->query('idSolicitud');
         $idExpediente = $request->query('idExpediente');
             
@@ -1203,6 +1399,10 @@ use Log;
      */
     public function cambiarUnidadesCondominales(Request $request){
       try{
+        $idUsuario = $this->obtenIdPerito($request);
+        if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+        }
         $arr = array(
         'PAR_IDUNIDADCONDOMINAL' => $request->query('idUnidadCondominal'),
         'PAR_IDSOLICITUD' => $request->query('idSolicitud'),
@@ -1250,6 +1450,10 @@ use Log;
 
      public function GuardarDatosDSCondMantenimiento(Request $request){
         try{
+          $idUsuario = $this->obtenIdPerito($request);
+          if($idUsuario == false){
+          return response()->json(['mensaje' => 'Se necesita el token de sesión'], 403);
+          }
           $dseCondMantenimiento = $request->query('dseCondMantenimiento');
           $xmlDoc = $request->query('xmlDoc');
           $tipoDocumentoDigital = $request->query('tipoDocumentoDigital');

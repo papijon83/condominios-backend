@@ -30,6 +30,7 @@ $router->group(['prefix' => 'api'], function() use ($router){
         });
 
         $router->group(['prefix' => 'condominios'], function() use ($router){
+            $router->get('GetToken','CondominioController@getToken');
             $router->get('ObtenerDireccionPorId','CondominioController@obtenerDireccionPorId');
             $router->get('ObtenerDatosDSCondMantRellenosPorIdSolicitud','CondominioController@obtenerDatosDSCondMantRellenosPorIdSolicitud');
             $router->get('ObtenerIdSolicitudPorUnidadPredial','CondominioController@obtenerIdSolicitudPorUnidadPredial');
